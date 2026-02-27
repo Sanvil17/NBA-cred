@@ -1,0 +1,165 @@
+// Prisma Schema for NBA Criterion 4 Compliance System
+// Database: PostgreSQL (production) / SQLite (dev)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+  HOD
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ActivityCategory {
+  HACKATHON
+  WORKSHOP
+  CERTIFICATION
+  INTERNSHIP
+  CONFERENCE
+  COMPETITION
+  PUBLICATION
+}
+
+enum OutcomeCategory {
+  PLACEMENT
+  HIGHER_STUDIES
+  ENTREPRENEURSHIP
+}
+
+enum GeographicLevel {
+  INSTITUTE
+  STATE
+  NATIONAL
+  INTERNATIONAL
+}
+
+enum AchievementTier {
+  PARTICIPANT
+  ORGANIZER
+  WINNER_1ST
+  WINNER_2ND
+  WINNER_3RD
+}
+
+enum SectorType {
+  CORE
+  IT
+  OTHER
+}
+
+// ─── Core Identity & Access Management ───────────────────────────────
+model User {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  passwordHash   String
+  role           Role     @default(STUDENT)
+  fullName       String
+  avatarUrl      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  student        Student?
+}
+
+// ─── Student Master Profile ──────────────────────────────────────────
+model Student {
+  id              String              @id @default(uuid())
+  userId          String              @unique
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enrollmentNo    String              @unique
+  batchYear       Int
+  programCode     String              // e.g., "CSE", "ECE", "MECH"
+  programName     String              // e.g., "B.Tech Computer Science"
+  section         String?
+  cgpa            Float?
+  achievements    AchievementRecord[]
+  outcomes        OutcomeRecord[]
+  academics       AcademicPerformance[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([batchYear])
+  @@index([programCode])
+}
+
+// ─── Professional Activities (Criterion 4.6) ─────────────────────────
+model AchievementRecord {
+  id                 String             @id @default(uuid())
+  studentId          String
+  student            Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  category           ActivityCategory
+  title              String
+  description        String?
+  organizingBody     String?
+  geographicLevel    GeographicLevel    @default(INSTITUTE)
+  achievementTier    AchievementTier    @default(PARTICIPANT)
+  eventDate          DateTime
+  eventEndDate       DateTime?
+  certificateUrl     String?            // Evidence Vault link
+  verificationStatus VerificationStatus @default(PENDING)
+  adminComment       String?
+  verifiedBy         String?            // Admin user ID
+  verifiedAt         DateTime?
+  academicYear       String             // e.g., "2024-25"
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([studentId])
+  @@index([verificationStatus])
+  @@index([category])
+  @@index([academicYear])
+}
+
+// ─── Post-Graduation Outcomes (Criterion 4.5/4.6) ───────────────────
+model OutcomeRecord {
+  id                 String             @id @default(uuid())
+  studentId          String
+  student            Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  category           OutcomeCategory
+  entityName         String             // Employer, University, or Startup name
+  sectorType         SectorType?        // For placements: CORE/IT
+  salaryLPA          Float?             // For placements
+  referenceDetails   String?            // Offer letter no, GATE score, CIN
+  evidenceUrl        String?            // Evidence Vault link
+  outcomeDate        DateTime
+  verificationStatus VerificationStatus @default(PENDING)
+  adminComment       String?
+  verifiedBy         String?
+  verifiedAt         DateTime?
+  academicYear       String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([studentId])
+  @@index([verificationStatus])
+  @@index([category])
+  @@index([academicYear])
+}
+
+// ─── Academic Performance (Criterion 4.5 – API Calculation) ──────────
+model AcademicPerformance {
+  id                 String   @id @default(uuid())
+  studentId          String
+  student            Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  academicYear       String   // e.g., "2024-25"
+  yearOfStudy        Int      // 2nd year, 3rd year, etc.
+  gpa                Float    // On 10-point scale
+  totalCredits       Int?
+  backlogs           Int      @default(0)
+  passed             Boolean  @default(true)
+  createdAt          DateTime @default(now())
+
+  @@unique([studentId, academicYear, yearOfStudy])
+  @@index([academicYear])
+}
