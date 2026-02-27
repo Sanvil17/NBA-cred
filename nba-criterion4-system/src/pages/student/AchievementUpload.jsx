@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import TopBar from '../../components/layout/TopBar';
 import {
     Upload, FileUp, CheckCircle2, ChevronRight, ChevronLeft,
@@ -26,6 +27,7 @@ const sectorTypes = ['CORE', 'IT', 'OTHER'];
 
 export default function AchievementUpload() {
     const navigate = useNavigate();
+    const toast = useToast();
     const [step, setStep] = useState(1);
     const [submitted, setSubmitted] = useState(false);
 
@@ -50,6 +52,7 @@ export default function AchievementUpload() {
 
     const handleSubmit = () => {
         setSubmitted(true);
+        toast.success('Achievement submitted successfully! Pending verification.');
         setTimeout(() => navigate('/student/achievements'), 2500);
     };
 

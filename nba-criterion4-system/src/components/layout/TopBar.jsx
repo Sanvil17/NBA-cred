@@ -1,5 +1,6 @@
 import { Bell, Search, Calendar, Command } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import NotificationPanel from '../NotificationPanel';
 
 export default function TopBar({ title, subtitle }) {
     const { currentUser } = useAuth();
@@ -46,6 +47,11 @@ export default function TopBar({ title, subtitle }) {
                             placeholder="Search..."
                             className="bg-transparent border-none outline-none text-[13px] placeholder-[var(--color-text-faint)] w-32 focus:w-48 transition-all duration-300"
                             style={{ color: 'var(--color-text-secondary)' }}
+                            onFocus={(e) => {
+                                e.target.blur();
+                                // Trigger command palette
+                                window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+                            }}
                         />
                         <kbd className="hidden xl:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold"
                             style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border)', color: 'var(--color-text-faint)' }}>
@@ -54,13 +60,7 @@ export default function TopBar({ title, subtitle }) {
                     </div>
 
                     {/* Notifications */}
-                    <button
-                        className="relative p-2.5 rounded-xl transition-all hover:bg-[var(--color-bg-hover)] group"
-                        style={{ color: 'var(--color-text-muted)' }}
-                    >
-                        <Bell className="w-[18px] h-[18px] transition-transform group-hover:rotate-12" />
-                        <span className="absolute top-2.5 right-2 w-[7px] h-[7px] rounded-full animate-pulse-s" style={{ background: 'var(--color-accent)' }} />
-                    </button>
+                    <NotificationPanel />
 
                     {/* Avatar */}
                     <div className="w-9 h-9 rounded-full icon-accent flex items-center justify-center text-[11px] font-bold cursor-pointer transition-all hover:shadow-lg hover:scale-105">

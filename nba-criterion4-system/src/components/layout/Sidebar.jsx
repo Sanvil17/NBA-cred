@@ -4,13 +4,14 @@ import { useAuth } from '../../context/AuthContext';
 import {
     LayoutDashboard, Upload, FolderOpen, Shield, ClipboardCheck,
     BarChart3, FileSpreadsheet, Users, LogOut, GraduationCap,
-    ChevronLeft, ChevronRight, Menu, X
+    ChevronLeft, ChevronRight, Menu, X, Settings, History
 } from 'lucide-react';
 
 const studentNav = [
     { to: '/student', icon: LayoutDashboard, label: 'Dashboard', end: true },
     { to: '/student/upload', icon: Upload, label: 'Upload Achievement' },
     { to: '/student/achievements', icon: FolderOpen, label: 'My Achievements' },
+    { to: '/student/settings', icon: Settings, label: 'Settings' },
 ];
 
 const adminNav = [
@@ -19,6 +20,8 @@ const adminNav = [
     { to: '/admin/analytics', icon: BarChart3, label: 'NBA Analytics' },
     { to: '/admin/sar-export', icon: FileSpreadsheet, label: 'SAR Export' },
     { to: '/admin/students', icon: Users, label: 'Student Directory' },
+    { to: '/admin/audit', icon: History, label: 'Audit Log' },
+    { to: '/admin/settings', icon: Settings, label: 'Settings' },
 ];
 
 export default function Sidebar() {
@@ -106,7 +109,7 @@ export default function Sidebar() {
                 )}
                 <button
                     onClick={handleLogout}
-                    className="flex items-center gap-3 w-full px-3 py-[10px] rounded-xl text-[13px] font-medium transition-all duration-200 hover:bg-red-50 text-[var(--color-text-muted)] hover:text-red-600 group"
+                    className="flex items-center gap-3 w-full px-3 py-[10px] rounded-xl text-[13px] font-medium transition-all duration-200 hover:bg-red-50 text-[var(--color-text-muted)] hover:text-red-600 group cursor-pointer"
                 >
                     <LogOut className="w-[17px] h-[17px] shrink-0 transition-transform duration-200 group-hover:-translate-x-0.5" />
                     {!collapsed && 'Sign Out'}
@@ -116,7 +119,7 @@ export default function Sidebar() {
             {/* Collapse */}
             <button
                 onClick={() => setCollapsed(!collapsed)}
-                className="hidden md:flex items-center justify-center h-11 shrink-0 transition-all duration-200 hover:bg-[var(--color-bg-hover)]"
+                className="hidden md:flex items-center justify-center h-11 shrink-0 transition-all duration-200 hover:bg-[var(--color-bg-hover)] cursor-pointer"
                 style={{ borderTop: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}
             >
                 {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -128,7 +131,7 @@ export default function Sidebar() {
         <>
             {/* Mobile Hamburger */}
             <button
-                className="md:hidden fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-white border text-[var(--color-text-secondary)]"
+                className="md:hidden fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-white border text-[var(--color-text-secondary)] cursor-pointer"
                 style={{ borderColor: 'var(--color-border)', boxShadow: 'var(--shadow-float)' }}
                 onClick={() => setMobileOpen(!mobileOpen)}
             >
